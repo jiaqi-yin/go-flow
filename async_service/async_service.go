@@ -4,23 +4,33 @@ import (
 	"sync"
 )
 
-type ServiceCall struct {
+type serviceCall struct {
+	Name       string
 	Call       func() (interface{}, error)
 	ResponseCh chan interface{}
 	ErrorCh    chan error
 }
 
-type AsyncServiceManager struct {
-	Services []*ServiceCall
+func NewServiceCall(name string, call func() (interface{}, error)) *serviceCall {
+	return &serviceCall{
+		Name:       name,
+		Call:       call,
+		ResponseCh: make(chan interface{}),
+		ErrorCh:    make(chan error),
+	}
 }
 
-func NewAsyncServiceManager(services []*ServiceCall) *AsyncServiceManager {
-	return &AsyncServiceManager{
+type asyncServiceManager struct {
+	Services []*serviceCall
+}
+
+func NewAsyncServiceManager(services ...*serviceCall) *asyncServiceManager {
+	return &asyncServiceManager{
 		Services: services,
 	}
 }
 
-func (s *AsyncServiceManager) Async() ([]interface{}, []error) {
+func (s *asyncServiceManager) Async() (map[string]interface{}, []error) {
 	numServices := len(s.Services)
 
 	var wg sync.WaitGroup
@@ -42,15 +52,15 @@ func (s *AsyncServiceManager) Async() ([]interface{}, []error) {
 	}()
 
 	// Collect responses and handle errors
-	responses := make([]interface{}, numServices)
-	errors := make([]error, numServices)
+	responses := make(map[string]interface{}, numServices)
+	errors := []error{}
 
-	for i, service := range s.Services {
+	for _, service := range s.Services {
 		select {
 		case res := <-service.ResponseCh:
-			responses[i] = res
+			responses[service.Name] = res
 		case err := <-service.ErrorCh:
-			errors[i] = err
+			errors = append(errors, err)
 		}
 	}
 

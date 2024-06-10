@@ -21,7 +21,7 @@ type ResponseC struct {
 
 // Simulate the service calls that may return an error
 func ServiceA() (*ResponseA, error) {
-	time.Sleep(500 * time.Millisecond) // Simulate network delay
+	time.Sleep(150 * time.Millisecond) // Simulate network delay
 	if rand.Float32() < 0.3 {          // 30% chance of error
 		return nil, errors.New("ServiceA error")
 	}
@@ -29,7 +29,7 @@ func ServiceA() (*ResponseA, error) {
 }
 
 func ServiceB() ([]*ResponseB, error) {
-	time.Sleep(500 * time.Millisecond) // Simulate network delay
+	time.Sleep(100 * time.Millisecond) // Simulate network delay
 	if rand.Float32() < 0.3 {          // 30% chance of error
 		return nil, errors.New("ServiceB error")
 	}
@@ -40,9 +40,9 @@ func ServiceB() ([]*ResponseB, error) {
 }
 
 func ServiceC() ([]*ResponseC, error) {
-	time.Sleep(500 * time.Millisecond) // Simulate network delay
-	if rand.Float32() < 0.3 {          // 30% chance of error
-		return nil, errors.New("ServiceB error")
+	time.Sleep(50 * time.Millisecond) // Simulate network delay
+	if rand.Float32() < 0.3 {         // 30% chance of error
+		return nil, errors.New("ServiceC error")
 	}
 	return []*ResponseC{
 		{Data: rand.Float32()},
