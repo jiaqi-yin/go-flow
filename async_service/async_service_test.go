@@ -12,9 +12,9 @@ func TestAsyncService(t *testing.T) {
 	var errors = []error{}
 
 	responses, errs := asyncservice.NewAsyncServiceManager(
-		asyncservice.NewServiceCall("ServiceA", func() (interface{}, error) { return asyncservice.ServiceA() }),
-		asyncservice.NewServiceCall("ServiceB", func() (interface{}, error) { return asyncservice.ServiceB() }),
-		asyncservice.NewServiceCall("ServiceC", func() (interface{}, error) { return asyncservice.ServiceC() }),
+		asyncservice.NewServiceCall("ServiceA", func(...any) (any, error) { return asyncservice.ServiceA("foo bar") }),
+		asyncservice.NewServiceCall("ServiceB", func(...any) (any, error) { return asyncservice.ServiceB() }),
+		asyncservice.NewServiceCall("ServiceC", func(...any) (any, error) { return asyncservice.ServiceC() }),
 	).Async()
 
 	// Handle errors and process responses

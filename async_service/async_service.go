@@ -6,16 +6,16 @@ import (
 
 type serviceCall struct {
 	Name       string
-	Call       func() (interface{}, error)
-	ResponseCh chan interface{}
+	Call       func(...any) (any, error)
+	ResponseCh chan any
 	ErrorCh    chan error
 }
 
-func NewServiceCall(name string, call func() (interface{}, error)) *serviceCall {
+func NewServiceCall(name string, call func(...any) (any, error)) *serviceCall {
 	return &serviceCall{
 		Name:       name,
 		Call:       call,
-		ResponseCh: make(chan interface{}),
+		ResponseCh: make(chan any),
 		ErrorCh:    make(chan error),
 	}
 }
@@ -30,7 +30,7 @@ func NewAsyncServiceManager(services ...*serviceCall) *asyncServiceManager {
 	}
 }
 
-func (s *asyncServiceManager) Async() (map[string]interface{}, []error) {
+func (s *asyncServiceManager) Async() (map[string]any, []error) {
 	numServices := len(s.Services)
 
 	var wg sync.WaitGroup
@@ -52,7 +52,7 @@ func (s *asyncServiceManager) Async() (map[string]interface{}, []error) {
 	}()
 
 	// Collect responses and handle errors
-	responses := make(map[string]interface{}, numServices)
+	responses := make(map[string]any, numServices)
 	errors := []error{}
 
 	for _, service := range s.Services {
@@ -68,7 +68,7 @@ func (s *asyncServiceManager) Async() (map[string]interface{}, []error) {
 }
 
 // Generic function to handle concurrent service calls
-func FetchService[T any](wg *sync.WaitGroup, service func() (T, error), responseCh chan<- T, errorCh chan<- error) {
+func FetchService[T any](wg *sync.WaitGroup, service func(...any) (T, error), responseCh chan<- T, errorCh chan<- error) {
 	defer wg.Done()
 	if res, err := service(); err != nil {
 		errorCh <- err

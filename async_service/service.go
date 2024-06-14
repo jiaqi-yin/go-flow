@@ -2,6 +2,7 @@ package asyncservice
 
 import (
 	"errors"
+	"fmt"
 	"math/rand"
 	"time"
 )
@@ -20,12 +21,12 @@ type ResponseC struct {
 }
 
 // Simulate the service calls that may return an error
-func ServiceA() (*ResponseA, error) {
+func ServiceA(foo string) (*ResponseA, error) {
 	time.Sleep(150 * time.Millisecond) // Simulate network delay
 	if rand.Float32() < 0.3 {          // 30% chance of error
 		return nil, errors.New("ServiceA error")
 	}
-	return &ResponseA{Data: "Data from ServiceA"}, nil
+	return &ResponseA{Data: fmt.Sprintf("Data from ServiceA: %s", foo)}, nil
 }
 
 func ServiceB() ([]*ResponseB, error) {
